@@ -20,28 +20,9 @@
       color: white;
       font-family: sans-serif;
     }
-    .loading {
-      text-align: center;
-    }
   </style>
 </head>
 <body>
-  <div class="loading">
-    <h2>AgroSense Mesh Mobile</h2>
-    <p>Carregando aplicação Flutter...</p>
-  </div>
-  <script src="flutter.js" defer></script>
-  <script>
-    window.addEventListener('load', function(ev) {
-      _flutter.loader.loadEntrypoint({
-        onEntrypointLoaded: function(engineInitializer) {
-          engineInitializer.initializeEngine().then(function(appRunner) {
-            appRunner.runApp();
-          });
-        }
-      });
-    });
-  </script>
+  <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
-

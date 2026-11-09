@@ -63,8 +63,8 @@ void main() {
     test('4. Não deve acionar irrigação (precisaIrrigacao == false) quando umidade >= 40%', () {
       final t = RegistroTelemetria(
         id: 'TEL-04',
-        sensorId: 'SENSOR-D1',
-        zona: 'Zona D',
+        sensorId: 'sensor-B-01',
+        zona: 'Zona B',
         umidadeSolo: 40.0,
         temperatura: 25.0,
         nivelBateria: 100,
@@ -117,8 +117,8 @@ void main() {
     test('7. Deve gerar cópia com copyWith alterando status de sincronização', () {
       final t1 = RegistroTelemetria(
         id: 'TEL-05',
-        sensorId: 'SENSOR-E1',
-        zona: 'Zona E',
+        sensorId: 'sensor-C-01',
+        zona: 'Zona C',
         umidadeSolo: 60.0,
         temperatura: 22.0,
         nivelBateria: 90,

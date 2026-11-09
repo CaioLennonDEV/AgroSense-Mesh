@@ -69,11 +69,11 @@ class DatabaseHelper {
     final batch = db.batch();
     final agora = DateTime.now();
 
-    // Dados iniciais das 5 Zonas de Plantio do AgroSense
+    // Dados iniciais das Zonas de Plantio ativas (Zona A, Zona B, Zona C)
     final leituras = [
       {
         'id': 'TEL-INIT-01',
-        'sensor_id': 'SENSOR-A1',
+        'sensor_id': 'sensor-A-01',
         'zona': 'Zona A',
         'umidade_solo': 48.5,
         'temperatura': 26.2,
@@ -83,7 +83,7 @@ class DatabaseHelper {
       },
       {
         'id': 'TEL-INIT-02',
-        'sensor_id': 'SENSOR-B2',
+        'sensor_id': 'sensor-B-01',
         'zona': 'Zona B',
         'umidade_solo': 34.0, // < 40% (Dispara irrigação!)
         'temperatura': 29.8,
@@ -93,33 +93,13 @@ class DatabaseHelper {
       },
       {
         'id': 'TEL-INIT-03',
-        'sensor_id': 'SENSOR-C1',
+        'sensor_id': 'sensor-C-01',
         'zona': 'Zona C',
         'umidade_solo': 52.0,
         'temperatura': 24.5,
         'nivel_bateria': 92,
         'timestamp': agora.subtract(const Duration(minutes: 20)).toIso8601String(),
         'sincronizado': 1,
-      },
-      {
-        'id': 'TEL-INIT-04',
-        'sensor_id': 'SENSOR-D1',
-        'zona': 'Zona D',
-        'umidade_solo': 31.5, // < 40% (Dispara irrigação!)
-        'temperatura': 31.0,
-        'nivel_bateria': 79,
-        'timestamp': agora.subtract(const Duration(minutes: 10)).toIso8601String(),
-        'sincronizado': 0, // Pendente
-      },
-      {
-        'id': 'TEL-INIT-05',
-        'sensor_id': 'SENSOR-E1',
-        'zona': 'Zona E',
-        'umidade_solo': 42.0,
-        'temperatura': 25.0,
-        'nivel_bateria': 85,
-        'timestamp': agora.subtract(const Duration(minutes: 5)).toIso8601String(),
-        'sincronizado': 0, // Pendente
       },
     ];
 

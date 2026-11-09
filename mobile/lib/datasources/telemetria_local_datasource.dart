@@ -66,33 +66,13 @@ class TelemetriaLocalDatasourceImpl implements TelemetriaLocalDatasource {
       ),
       RegistroTelemetria(
         id: 'TEL-INIT-03',
-        sensorId: 'SENSOR-C1',
+        sensorId: 'sensor-C-01',
         zona: 'Zona C',
         umidadeSolo: 52.0,
         temperatura: 24.5,
         nivelBateria: 92,
         timestamp: agora.subtract(const Duration(minutes: 20)),
         sincronizado: true,
-      ),
-      RegistroTelemetria(
-        id: 'TEL-INIT-04',
-        sensorId: 'SENSOR-D1',
-        zona: 'Zona D',
-        umidadeSolo: 31.5, // < 40% (crítica)
-        temperatura: 31.0,
-        nivelBateria: 79,
-        timestamp: agora.subtract(const Duration(minutes: 10)),
-        sincronizado: false,
-      ),
-      RegistroTelemetria(
-        id: 'TEL-INIT-05',
-        sensorId: 'SENSOR-E1',
-        zona: 'Zona E',
-        umidadeSolo: 42.0,
-        temperatura: 25.0,
-        nivelBateria: 85,
-        timestamp: agora.subtract(const Duration(minutes: 5)),
-        sincronizado: false,
       ),
     ];
 

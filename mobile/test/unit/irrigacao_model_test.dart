@@ -29,7 +29,7 @@ void main() {
       final map = {
         'id': 'IRR-02',
         'telemetria_id': 'TEL-02',
-        'zona': 'Zona D',
+        'zona': 'Zona C',
         'valvula_acionada': 1,
         'volume_litros': 200.0,
         'motivo': 'Acionamento de Emergência',
@@ -79,7 +79,7 @@ void main() {
     test('5. Deve formatar toString() com status da válvula e flag de sync', () {
       final e = EventoIrrigacao(
         id: 'IRR-05',
-        zona: 'Zona E',
+        zona: 'Zona A',
         valvulaAcionada: true,
         volumeLitros: 50.0,
         motivo: 'Umidade baixa',
@@ -89,7 +89,7 @@ void main() {
 
       final str = e.toString();
       expect(str, contains('IRR-05'));
-      expect(str, contains('Zona E'));
+      expect(str, contains('Zona A'));
       expect(str, contains('ABERTA'));
       expect(str, contains('✓ SYNC'));
     });

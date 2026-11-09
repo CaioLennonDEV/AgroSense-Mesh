@@ -140,8 +140,8 @@ void main() {
 
       final telemetria = RegistroTelemetria(
         id: 'TEL-TEST-04',
-        sensorId: 'SENSOR-D1',
-        zona: 'Zona D',
+        sensorId: 'sensor-B-01',
+        zona: 'Zona B',
         umidadeSolo: 62.0,
         temperatura: 23.0,
         nivelBateria: 85,
@@ -208,8 +208,8 @@ void main() {
       await fakeLocal.salvarOuAtualizarTelemetria(
         RegistroTelemetria(
           id: 'TEL-PENDENTE',
-          sensorId: 'SENSOR-E1',
-          zona: 'Zona E',
+          sensorId: 'sensor-C-01',
+          zona: 'Zona C',
           umidadeSolo: 50.0,
           temperatura: 22.0,
           nivelBateria: 90,

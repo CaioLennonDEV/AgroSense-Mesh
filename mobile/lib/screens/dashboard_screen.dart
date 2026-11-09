@@ -211,7 +211,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       OutlinedButton.icon(
                         icon: const Icon(Icons.grid_view_rounded),
-                        label: const Text('Ver Zonas (A-E)'),
+                        label: const Text('Ver Zonas (A-C)'),
                         onPressed: () => Navigator.pushNamed(context, '/zonas'),
                       ),
                     ],

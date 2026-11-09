@@ -20,7 +20,7 @@ class _NovoComandoIrrigacaoScreenState extends State<NovoComandoIrrigacaoScreen>
   String _zonaSelecionada = 'Zona A';
   bool _salvando = false;
 
-  final List<String> _zonas = ['Zona A', 'Zona B', 'Zona C', 'Zona D', 'Zona E'];
+  final List<String> _zonas = ['Zona A', 'Zona B', 'Zona C'];
 
   @override
   void initState() {

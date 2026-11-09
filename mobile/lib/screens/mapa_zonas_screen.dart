@@ -16,7 +16,7 @@ class _MapaZonasScreenState extends State<MapaZonasScreen> {
   bool _isLoading = true;
   List<RegistroTelemetria> _telemetrias = [];
 
-  final List<String> _zonas = ['Zona A', 'Zona B', 'Zona C', 'Zona D', 'Zona E'];
+  final List<String> _zonas = ['Zona A', 'Zona B', 'Zona C'];
 
   @override
   void initState() {
@@ -43,7 +43,7 @@ class _MapaZonasScreenState extends State<MapaZonasScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Zonas de Plantio (A-E)'),
+        title: const Text('Zonas de Plantio (A-C)'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),

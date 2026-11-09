@@ -91,7 +91,7 @@ class AppDrawer extends StatelessWidget {
                   context,
                   route: '/zonas',
                   icon: Icons.grid_view_rounded,
-                  title: 'Zonas de Plantio (A-E)',
+                  title: 'Zonas de Plantio (A-C)',
                 ),
                 const Divider(),
                 _buildItem(

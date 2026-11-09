@@ -6,17 +6,11 @@ services:
     container_name: agrosense-mobile-web
     ports:
       - "8080:8080"
-    command: flutter run -d web-server --web-port=8080 --web-hostname=0.0.0.0
-    volumes:
-      - .:/app
-      - /app/.dart_tool
+    restart: unless-stopped
 
   agrosense-mobile-test:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.test
     container_name: agrosense-mobile-test
     command: flutter test --reporter=expanded
-    volumes:
-      - .:/app
-      - /app/.dart_tool

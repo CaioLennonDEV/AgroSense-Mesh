@@ -19,7 +19,7 @@ class _LeiturasListScreenState extends State<LeiturasListScreen> {
   List<RegistroTelemetria> _todas = [];
   String _filtroZona = 'Todas';
 
-  final List<String> _zonas = ['Todas', 'Zona A', 'Zona B', 'Zona C', 'Zona D', 'Zona E'];
+  final List<String> _zonas = ['Todas', 'Zona A', 'Zona B', 'Zona C'];
 
   @override
   void initState() {
