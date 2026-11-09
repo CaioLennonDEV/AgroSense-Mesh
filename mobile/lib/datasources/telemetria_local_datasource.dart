@@ -74,6 +74,26 @@ class TelemetriaLocalDatasourceImpl implements TelemetriaLocalDatasource {
         timestamp: agora.subtract(const Duration(minutes: 20)),
         sincronizado: true,
       ),
+      RegistroTelemetria(
+        id: 'TEL-INIT-04',
+        sensorId: 'sensor-D-01',
+        zona: 'Zona D',
+        umidadeSolo: 38.2, // < 40% (crítica)
+        temperatura: 31.0,
+        nivelBateria: 85,
+        timestamp: agora.subtract(const Duration(minutes: 15)),
+        sincronizado: true,
+      ),
+      RegistroTelemetria(
+        id: 'TEL-INIT-05',
+        sensorId: 'sensor-E-01',
+        zona: 'Zona E',
+        umidadeSolo: 64.7,
+        temperatura: 23.8,
+        nivelBateria: 97,
+        timestamp: agora.subtract(const Duration(minutes: 10)),
+        sincronizado: true,
+      ),
     ];
 
     for (final l in leituras) {
@@ -88,6 +108,17 @@ class TelemetriaLocalDatasourceImpl implements TelemetriaLocalDatasource {
       volumeLitros: 150.0,
       motivo: 'Umidade abaixo de 40.0% (Lida: 34.0%)',
       timestamp: agora.subtract(const Duration(minutes: 29)),
+      sincronizado: true,
+    );
+
+    _webIrrigacoes['IRR-INIT-02'] = EventoIrrigacao(
+      id: 'IRR-INIT-02',
+      telemetriaId: 'TEL-INIT-04',
+      zona: 'Zona D',
+      valvulaAcionada: true,
+      volumeLitros: 200.0,
+      motivo: 'Umidade abaixo de 40.0% (Lida: 38.2%)',
+      timestamp: agora.subtract(const Duration(minutes: 14)),
       sincronizado: true,
     );
   }

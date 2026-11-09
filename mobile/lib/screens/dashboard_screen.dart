@@ -156,7 +156,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Zonas A, B e C com controle hídrico inteligente e tolerância a falhas',
+                              'Zonas A, B, C, D e E com controle hídrico inteligente e tolerância a falhas',
                               style: TextStyle(
                                 color: Colors.white.withAlpha(210),
                                 fontSize: 13,

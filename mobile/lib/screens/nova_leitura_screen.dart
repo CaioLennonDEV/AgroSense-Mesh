@@ -26,7 +26,7 @@ class _NovaLeituraScreenState extends State<NovaLeituraScreen> {
   String _zonaSelecionada = 'Zona A';
   bool _salvando = false;
 
-  final List<String> _zonas = ['Zona A', 'Zona B', 'Zona C'];
+  final List<String> _zonas = ['Zona A', 'Zona B', 'Zona C', 'Zona D', 'Zona E'];
 
   @override
   void initState() {

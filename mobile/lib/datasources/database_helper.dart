@@ -101,6 +101,26 @@ class DatabaseHelper {
         'timestamp': agora.subtract(const Duration(minutes: 20)).toIso8601String(),
         'sincronizado': 1,
       },
+      {
+        'id': 'TEL-INIT-04',
+        'sensor_id': 'sensor-D-01',
+        'zona': 'Zona D',
+        'umidade_solo': 28.5, // < 40% (Solo seco)
+        'temperatura': 31.0,
+        'nivel_bateria': 84,
+        'timestamp': agora.subtract(const Duration(minutes: 15)).toIso8601String(),
+        'sincronizado': 1,
+      },
+      {
+        'id': 'TEL-INIT-05',
+        'sensor_id': 'sensor-E-01',
+        'zona': 'Zona E',
+        'umidade_solo': 61.2,
+        'temperatura': 22.8,
+        'nivel_bateria': 96,
+        'timestamp': agora.subtract(const Duration(minutes: 10)).toIso8601String(),
+        'sincronizado': 1,
+      },
     ];
 
     for (final l in leituras) {

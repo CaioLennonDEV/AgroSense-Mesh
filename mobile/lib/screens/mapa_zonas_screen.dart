@@ -17,18 +17,22 @@ class _MapaZonasScreenState extends State<MapaZonasScreen> {
   bool _isLoading = true;
   List<RegistroTelemetria> _telemetrias = [];
 
-  final List<String> _zonas = ['Zona A', 'Zona B', 'Zona C'];
+  final List<String> _zonas = ['Zona A', 'Zona B', 'Zona C', 'Zona D', 'Zona E'];
 
   final Map<String, String> _descricoes = {
     'Zona A': 'Talhão Norte • Cultura de Café Arábica',
     'Zona B': 'Talhão Sul • Área de Pastagem & Silagem',
     'Zona C': 'Talhão Leste • Hortaliças & Estufas Climatizadas',
+    'Zona D': 'Talhão Oeste • Pomar de Citros & Fruticultura',
+    'Zona E': 'Talhão Central • Milho & Grãos Irrigados',
   };
 
   final Map<String, Color> _coresZona = {
     'Zona A': const Color(0xFF065F46),
     'Zona B': const Color(0xFF0284C7),
     'Zona C': const Color(0xFF7C3AED),
+    'Zona D': const Color(0xFFD97706),
+    'Zona E': const Color(0xFFDB2777),
   };
 
   @override
@@ -56,7 +60,7 @@ class _MapaZonasScreenState extends State<MapaZonasScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Zonas de Plantio (A-C)'),
+        title: const Text('Zonas de Plantio (A-E)'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
