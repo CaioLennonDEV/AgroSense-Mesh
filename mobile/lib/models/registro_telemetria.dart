@@ -31,6 +31,10 @@ class RegistroTelemetria {
   /// Se Umidade < 40%, o sistema aciona automaticamente a válvula de irrigação.
   bool get precisaIrrigacao => umidadeSolo < 40.0;
 
+  /// Aliases de conveniência
+  int get bateria => nivelBateria;
+  DateTime get dataHora => timestamp;
+
   /// Cria uma cópia com alteração de atributos ou status de sincronização.
   RegistroTelemetria copyWith({
     String? id,

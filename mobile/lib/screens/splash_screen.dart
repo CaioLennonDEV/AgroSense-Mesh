@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _inicializarApp() async {
-    await Future.delayed(const Duration(milliseconds: 1000));
+    await Future.delayed(const Duration(milliseconds: 900));
     try {
       // Inicializa o banco SQLite carregando as tabelas e leituras iniciais
       await AppServiceLocator.instance.repository.listarTelemetrias();
@@ -31,57 +31,86 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.agroGreenPrimary,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.white.withAlpha(30),
-                shape: BoxShape.circle,
+      body: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF064E3B), Color(0xFF047857), Color(0xFF0D9488)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(26),
+                decoration: BoxDecoration(
+                  color: Colors.white.withAlpha(35),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white.withAlpha(60), width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(40),
+                      blurRadius: 30,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.eco_rounded,
+                  size: 64,
+                  color: Colors.white,
+                ),
               ),
-              child: const Icon(
-                Icons.eco_rounded,
-                size: 72,
-                color: Colors.white,
+              const SizedBox(height: 28),
+              const Text(
+                'AgroSense Mesh',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'AgroSense Mesh',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.0,
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withAlpha(30),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Text(
+                  'Telemetria e Irrigação Offline-First',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Telemetria e Irrigação Offline-First',
-              style: TextStyle(
-                color: Colors.white.withAlpha(200),
-                fontSize: 16,
+              const SizedBox(height: 50),
+              const SizedBox(
+                width: 28,
+                height: 28,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.8,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
               ),
-            ),
-            const SizedBox(height: 48),
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Inicializando persistência local SQLite...',
-              style: TextStyle(
-                color: Colors.white.withAlpha(160),
-                fontSize: 12,
+              const SizedBox(height: 16),
+              Text(
+                'Inicializando SQLite e nós do cluster...',
+                style: TextStyle(
+                  color: Colors.white.withAlpha(190),
+                  fontSize: 12,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
-

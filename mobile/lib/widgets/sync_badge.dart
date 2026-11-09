@@ -22,24 +22,25 @@ class SyncBadge extends StatelessWidget {
     final texto = sincronizado ? 'Sincronizado' : 'Pendente';
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: cor.withAlpha(25),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cor.withAlpha(120), width: 1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: cor.withAlpha(90), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icone, size: 14, color: cor),
           if (exibirTexto) ...[
-            const SizedBox(width: 4),
+            const SizedBox(width: 5),
             Text(
               texto,
               style: TextStyle(
                 color: cor,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.2,
               ),
             ),
           ],
@@ -48,4 +49,3 @@ class SyncBadge extends StatelessWidget {
     );
   }
 }
-

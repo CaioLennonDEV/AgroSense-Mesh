@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/evento_irrigacao.dart';
 import '../services/app_service_locator.dart';
 import '../theme/app_theme.dart';
+import '../widgets/responsive_layout.dart';
 
 /// Rota 7: Formulário para Acionamento Manual Forçado de Válvula de Irrigação.
 class NovoComandoIrrigacaoScreen extends StatefulWidget {
@@ -65,6 +66,8 @@ class _NovoComandoIrrigacaoScreenState extends State<NovoComandoIrrigacaoScreen>
         SnackBar(
           content: Text(msg),
           backgroundColor: res.sincronizado ? AppTheme.syncGreen : AppTheme.pendingOrange,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
 
@@ -72,7 +75,12 @@ class _NovoComandoIrrigacaoScreenState extends State<NovoComandoIrrigacaoScreen>
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text('Erro: $e'),
+          backgroundColor: AppTheme.dangerRed,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
       );
     } finally {
       if (mounted) setState(() => _salvando = false);
@@ -84,31 +92,51 @@ class _NovoComandoIrrigacaoScreenState extends State<NovoComandoIrrigacaoScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Acionar Válvula Manual'),
-        backgroundColor: Colors.blue.shade800,
+        backgroundColor: AppTheme.waterBlue,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
+        child: ResponsiveLayout(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Setor
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppTheme.cardBorder, width: 1),
+                    boxShadow: AppTheme.softShadow,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Seleção de Setor de Irrigação',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppTheme.waterBlue.withAlpha(20),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.grid_view_rounded, color: AppTheme.waterBlue, size: 20),
+                          ),
+                          const SizedBox(width: 10),
+                          const Text(
+                            'Seleção de Setor de Irrigação',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textDark),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 18),
                       DropdownButtonFormField<String>(
                         value: _zonaSelecionada,
                         decoration: const InputDecoration(
                           labelText: 'Zona Alvo *',
-                          prefixIcon: Icon(Icons.grid_view_rounded),
+                          prefixIcon: Icon(Icons.location_on_rounded, color: AppTheme.waterBlue),
                         ),
                         items: _zonas.map((z) {
                           return DropdownMenuItem(value: z, child: Text(z));
@@ -120,28 +148,46 @@ class _NovoComandoIrrigacaoScreenState extends State<NovoComandoIrrigacaoScreen>
                     ],
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 18),
 
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
+                // Parâmetros
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppTheme.cardBorder, width: 1),
+                    boxShadow: AppTheme.softShadow,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Parâmetros do Disparo Hídrico',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.water_drop_rounded, color: AppTheme.waterBlue, size: 20),
+                          ),
+                          const SizedBox(width: 10),
+                          const Text(
+                            'Parâmetros do Disparo Hídrico',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textDark),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 18),
 
                       TextFormField(
                         controller: _volumeController,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         decoration: const InputDecoration(
                           labelText: 'Volume Estimado (Litros) *',
-                          prefixIcon: Icon(Icons.water_drop_rounded),
+                          prefixIcon: Icon(Icons.opacity_rounded, color: AppTheme.waterBlue),
                           hintText: 'Ex: 150.0',
                         ),
                         validator: (value) {
@@ -162,7 +208,7 @@ class _NovoComandoIrrigacaoScreenState extends State<NovoComandoIrrigacaoScreen>
                         maxLines: 2,
                         decoration: const InputDecoration(
                           labelText: 'Motivo / Justificativa do Acionamento *',
-                          prefixIcon: Icon(Icons.notes_rounded),
+                          prefixIcon: Icon(Icons.notes_rounded, color: AppTheme.waterBlue),
                         ),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
@@ -174,27 +220,34 @@ class _NovoComandoIrrigacaoScreenState extends State<NovoComandoIrrigacaoScreen>
                     ],
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.blue.shade800),
-                icon: _salvando
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                      )
-                    : const Icon(Icons.water_drop_rounded),
-                label: Text(_salvando ? 'Processando...' : 'Confirmar Acionamento'),
-                onPressed: _salvando ? null : _acionarValvula,
-              ),
-            ],
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.waterBlue,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    elevation: 2,
+                    shadowColor: AppTheme.waterBlue.withAlpha(80),
+                  ),
+                  icon: _salvando
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : const Icon(Icons.water_drop_rounded),
+                  label: Text(
+                    _salvando ? 'Processando Disparo...' : 'Confirmar Acionamento',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  onPressed: _salvando ? null : _acionarValvula,
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 }
-

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/registro_telemetria.dart';
 import '../theme/app_theme.dart';
 import '../widgets/moisture_indicator.dart';
+import '../widgets/responsive_layout.dart';
 import '../widgets/sync_badge.dart';
 
 /// Rota 5: Detalhamento de Leitura com passagem segura de argumentos via Rotas.
@@ -32,22 +33,31 @@ class DetalheLeituraScreen extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Status Card
-            Card(
-              child: Padding(
+        child: ResponsiveLayout(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Cartão de Destaque
+              Container(
                 padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.cardBorder, width: 1),
+                  boxShadow: AppTheme.softShadow,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        CircleAvatar(
-                          radius: 24,
-                          backgroundColor: AppTheme.agroGreenPrimary.withAlpha(25),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppTheme.agroGreenPrimary.withAlpha(20),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           child: const Icon(Icons.sensors_rounded, color: AppTheme.agroGreenPrimary, size: 28),
                         ),
                         const SizedBox(width: 16),
@@ -57,67 +67,92 @@ class DetalheLeituraScreen extends StatelessWidget {
                             children: [
                               Text(
                                 telemetria.sensorId,
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.textDark),
                               ),
+                              const SizedBox(height: 2),
                               Text(
                                 'Localização: ${telemetria.zona}',
-                                style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                                style: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
                               ),
                             ],
                           ),
                         ),
                       ],
                     ),
-                    const Divider(height: 32),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Divider(color: Colors.grey.shade200, height: 1),
+                    ),
                     MoistureIndicator(umidade: telemetria.umidadeSolo),
                   ],
                 ),
               ),
-            ),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 18),
 
-            // Especificações Técnicas
-            Card(
-              child: Padding(
+              // Especificações Técnicas
+              Container(
                 padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.cardBorder, width: 1),
+                  boxShadow: AppTheme.softShadow,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       'Telemetria e Diagnóstico de Campo',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textDark),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 18),
                     _buildRow(
                       icone: Icons.thermostat_rounded,
+                      cor: Colors.amber.shade700,
                       label: 'Temperatura Ambiente:',
                       valor: '${telemetria.temperatura.toStringAsFixed(1)} °C',
                     ),
-                    const Divider(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Divider(color: Colors.grey.shade100, height: 1),
+                    ),
                     _buildRow(
                       icone: Icons.battery_charging_full_rounded,
+                      cor: AppTheme.agroGreenSecondary,
                       label: 'Nível da Bateria:',
-                      valor: '${telemetria.nivelBateria}%',
+                      valor: '${telemetria.bateria}%',
                     ),
-                    const Divider(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Divider(color: Colors.grey.shade100, height: 1),
+                    ),
                     _buildRow(
                       icone: Icons.access_time_rounded,
+                      cor: Colors.blue.shade700,
                       label: 'Data / Hora da Leitura:',
                       valor:
-                          '${telemetria.timestamp.day.toString().padLeft(2, '0')}/${telemetria.timestamp.month.toString().padLeft(2, '0')}/${telemetria.timestamp.year} ${telemetria.timestamp.hour.toString().padLeft(2, '0')}:${telemetria.timestamp.minute.toString().padLeft(2, '0')}',
+                          '${telemetria.dataHora.day.toString().padLeft(2, '0')}/${telemetria.dataHora.month.toString().padLeft(2, '0')}/${telemetria.dataHora.year} ${telemetria.dataHora.hour.toString().padLeft(2, '0')}:${telemetria.dataHora.minute.toString().padLeft(2, '0')}',
                     ),
-                    const Divider(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Divider(color: Colors.grey.shade100, height: 1),
+                    ),
                     _buildRow(
                       icone: Icons.cloud_done_rounded,
+                      cor: telemetria.sincronizado ? AppTheme.syncGreen : AppTheme.pendingOrange,
                       label: 'Estado de Persistência:',
                       valor: telemetria.sincronizado
                           ? 'Sincronizado na Nuvem'
                           : 'Armazenado no SQLite Local (Pendente)',
                     ),
-                    const Divider(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Divider(color: Colors.grey.shade100, height: 1),
+                    ),
                     _buildRow(
                       icone: Icons.water_drop_rounded,
+                      cor: telemetria.precisaIrrigacao ? AppTheme.dangerRed : AppTheme.waterBlue,
                       label: 'Status da Válvula de Irrigação:',
                       valor: telemetria.precisaIrrigacao
                           ? 'ACIONADA AUTOMATICAMENTE (< 40%)'
@@ -126,38 +161,49 @@ class DetalheLeituraScreen extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            OutlinedButton.icon(
-              icon: const Icon(Icons.arrow_back_rounded),
-              label: const Text('Voltar para Listagem'),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ],
+              OutlinedButton.icon(
+                icon: const Icon(Icons.arrow_back_rounded),
+                label: const Text('Voltar para Listagem'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildRow({required IconData icone, required String label, required String valor}) {
+  Widget _buildRow({
+    required IconData icone,
+    required Color cor,
+    required String label,
+    required String valor,
+  }) {
     return Row(
       children: [
-        Icon(icone, size: 20, color: AppTheme.agroGreenPrimary),
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: cor.withAlpha(20),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Icon(icone, size: 18, color: cor),
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
             label,
-            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13, color: AppTheme.textMuted),
           ),
         ),
         Text(
           valor,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark),
         ),
       ],
     );
   }
 }
-
