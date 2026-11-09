@@ -242,3 +242,18 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  # ── 10. Aplicativo Móvel Flutter (Computação Móvel AP2B) ────────────────
+  mobile:
+    build:
+      context: ./mobile
+      dockerfile: Dockerfile
+    container_name: agrosense-mobile
+    ports:
+      - "8080:8080"
+    networks:
+      - mesh_net
+    depends_on:
+      - web
+    restart: unless-stopped
+
+

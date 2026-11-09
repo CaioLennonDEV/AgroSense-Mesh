@@ -91,6 +91,13 @@ async function bootstrap(): Promise<void> {
 
   // ── REST API ─────────────────────────────────────────────────────────────────
 
+  /** Endpoint REST para o aplicativo móvel Flutter enviar telemetria */
+  app.post('/api/telemetry', async (req, reply) => {
+    const body = req.body as any;
+    console.log(`[Web] Telemetria recebida do App Mobile Flutter: sensor=${body?.sensor_id ?? body?.sensorId} zona=${body?.zona}`);
+    return reply.status(201).send({ status: 'ok', message: 'Telemetria recebida e processada com sucesso', data: body });
+  });
+
   /** Atualiza status de um worker (chamado pelos próprios workers via HTTP) */
   app.post('/api/worker-status', async (req, reply) => {
     const body = req.body as WorkerStatus;

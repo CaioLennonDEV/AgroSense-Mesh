@@ -29,8 +29,8 @@ class TelemetriaRemoteDatasourceImpl implements TelemetriaRemoteDatasource {
     Uri? irrigacaoUri,
     Duration timeout = const Duration(seconds: 5),
   })  : _client = client ?? http.Client(),
-        _telemetriaUri = telemetriaUri ?? Uri.parse('https://jsonplaceholder.typicode.com/posts'),
-        _irrigacaoUri = irrigacaoUri ?? Uri.parse('https://jsonplaceholder.typicode.com/posts'),
+        _telemetriaUri = telemetriaUri ?? Uri.parse('http://localhost:3000/api/telemetry'),
+        _irrigacaoUri = irrigacaoUri ?? Uri.parse('http://localhost:3000/api/irrigation-logs'),
         _timeout = timeout;
 
   @override
