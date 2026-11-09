@@ -380,3 +380,17 @@ Este projeto utilizou ferramentas de Inteligência Artificial para análise arqu
   6. Endurecimento da subida Docker (healthchecks com `start_period`, `.gitattributes` com LF e troubleshooting de dependency no Primary).
   7. Padronização da ordenação causal (`worker_lamport` → `worker_id` → `message_id`) e remoção do `leader_election_log`.
   8. Endurecimento da Réplica (`pg_basebackup` com retry) e garantia de regra de replicação no Primary a cada start.
+
+---
+
+## 10. Módulo Móvel em Flutter (Computação Móvel — AP2B)
+
+Para o Marco 2 da disciplina de **Computação Móvel (2026/2)**, o sistema AgroSense Mesh conta com o módulo móvel multiplataforma em **Flutter/Dart** localizado no diretório [`mobile/`](mobile/README.md).
+
+O aplicativo implementa:
+* **Arquitetura Offline-First:** Persistência relacional local SQLite (`sqflite`) como Fonte Única da Verdade.
+* **Resiliência a Quedas de Rede:** Envio assíncrono via HTTP REST com `.timeout(Duration(seconds: 5))` e operação transparente em modo avião.
+* **Regra de Domínio de Campo:** Acionamento e persistência automática de irrigação quando $\text{Umidade} < 40\%$.
+* **10 Rotas Integradas em Material Design 3:** Formulários com validação estrita, listas dinâmicas com `Dismissible` e badges visuais de conectividade (`✓ Sincronizado` vs `⏳ Pendente`).
+* **Suíte de Testes Automatizados:** 20 testes de unidade e 5 testes de widgets (`flutter test`).
+
