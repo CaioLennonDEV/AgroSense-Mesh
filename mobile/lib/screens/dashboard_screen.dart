@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/evento_irrigacao.dart';
 import '../models/registro_telemetria.dart';
@@ -20,15 +21,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool _isLoading = true;
   List<RegistroTelemetria> _telemetrias = [];
   List<EventoIrrigacao> _irrigacoes = [];
+  Timer? _timerSincronizacao5s;
 
   @override
   void initState() {
     super.initState();
     _carregarDados();
+    // Timer de sincronização e atualização contínua a cada 5 segundos
+    _timerSincronizacao5s = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (mounted) _carregarDados(silencioso: true);
+    });
   }
 
-  Future<void> _carregarDados() async {
-    setState(() => _isLoading = true);
+  @override
+  void dispose() {
+    _timerSincronizacao5s?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _carregarDados({bool silencioso = false}) async {
+    if (!silencioso) setState(() => _isLoading = true);
     final repo = AppServiceLocator.instance.repository;
     try {
       final t = await repo.listarTelemetrias();
@@ -41,7 +53,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         });
       }
     } catch (_) {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted && !silencioso) setState(() => _isLoading = false);
     }
   }
 

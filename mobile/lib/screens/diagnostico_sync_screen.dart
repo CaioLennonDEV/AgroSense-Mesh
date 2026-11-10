@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/evento_irrigacao.dart';
 import '../models/registro_telemetria.dart';
@@ -25,15 +26,26 @@ class _DiagnosticoSyncScreenState extends State<DiagnosticoSyncScreen> {
   List<RegistroTelemetria> _telemetriasPendentes = [];
   List<EventoIrrigacao> _irrigacoesPendentes = [];
   String? _ultimoResultado;
+  Timer? _timerAutoSync5s;
 
   @override
   void initState() {
     super.initState();
     _carregarPendencias();
+    // Auto-sync timer a cada 5 segundos
+    _timerAutoSync5s = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (mounted && !_sincronizando) _carregarPendencias(silencioso: true);
+    });
   }
 
-  Future<void> _carregarPendencias() async {
-    setState(() => _isLoading = true);
+  @override
+  void dispose() {
+    _timerAutoSync5s?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _carregarPendencias({bool silencioso = false}) async {
+    if (!silencioso) setState(() => _isLoading = true);
     final repo = AppServiceLocator.instance.repository;
     try {
       // Puxa atualizações do cluster e lê pendências
@@ -48,7 +60,7 @@ class _DiagnosticoSyncScreenState extends State<DiagnosticoSyncScreen> {
         });
       }
     } catch (_) {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted && !silencioso) setState(() => _isLoading = false);
     }
   }
 
@@ -245,6 +257,14 @@ class _DiagnosticoSyncScreenState extends State<DiagnosticoSyncScreen> {
                           _buildParamRow(
                             'Timeout de Rede:',
                             '5.0 segundos (resiliente a modo avião)',
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: Divider(color: Colors.grey.shade100, height: 1),
+                          ),
+                          _buildParamRow(
+                            'Timer de Auto-Sync:',
+                            'Ativo a cada 5 segundos',
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),

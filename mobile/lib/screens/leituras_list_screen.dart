@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/registro_telemetria.dart';
 import '../services/app_service_locator.dart';
@@ -19,6 +20,7 @@ class _LeiturasListScreenState extends State<LeiturasListScreen> {
   bool _isLoading = true;
   List<RegistroTelemetria> _todas = [];
   String _filtroZona = 'Todas';
+  Timer? _timer5s;
 
   final List<String> _zonas = ['Todas', 'Zona A', 'Zona B', 'Zona C', 'Zona D', 'Zona E'];
 
@@ -26,10 +28,20 @@ class _LeiturasListScreenState extends State<LeiturasListScreen> {
   void initState() {
     super.initState();
     _carregarLeituras();
+    // Atualiza automaticamente as leituras a cada 5 segundos
+    _timer5s = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (mounted) _carregarLeituras(silencioso: true);
+    });
   }
 
-  Future<void> _carregarLeituras() async {
-    setState(() => _isLoading = true);
+  @override
+  void dispose() {
+    _timer5s?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _carregarLeituras({bool silencioso = false}) async {
+    if (!silencioso) setState(() => _isLoading = true);
     try {
       final lista = await AppServiceLocator.instance.repository.listarTelemetrias();
       if (mounted) {
@@ -39,7 +51,7 @@ class _LeiturasListScreenState extends State<LeiturasListScreen> {
         });
       }
     } catch (_) {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted && !silencioso) setState(() => _isLoading = false);
     }
   }
 
