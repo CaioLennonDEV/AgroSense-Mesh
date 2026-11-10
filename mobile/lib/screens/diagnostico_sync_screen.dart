@@ -36,6 +36,8 @@ class _DiagnosticoSyncScreenState extends State<DiagnosticoSyncScreen> {
     setState(() => _isLoading = true);
     final repo = AppServiceLocator.instance.repository;
     try {
+      // Puxa atualizações do cluster e lê pendências
+      await repo.listarTelemetrias();
       final t = await repo.listarTelemetriasPendentes();
       final i = await repo.listarIrrigacoesPendentes();
       if (mounted) {
@@ -234,7 +236,7 @@ class _DiagnosticoSyncScreenState extends State<DiagnosticoSyncScreen> {
                           ),
                           _buildParamRow(
                             'Backend Distribuído:',
-                            'http://localhost:3000/api/telemetry',
+                            'Cluster Mesh Cloud (/api/telemetry)',
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),

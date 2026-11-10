@@ -14,6 +14,7 @@ abstract class TelemetriaRemoteDatasource {
   Future<bool> enviarTelemetria(RegistroTelemetria telemetria);
   Future<bool> enviarEventoIrrigacao(EventoIrrigacao evento);
   Future<List<RegistroTelemetria>> buscarTelemetriasRemotas();
+  Future<List<EventoIrrigacao>> buscarIrrigacoesRemotas();
   Future<bool> excluirTelemetriaRemota(String id);
 }
 
@@ -108,6 +109,44 @@ class TelemetriaRemoteDatasourceImpl implements TelemetriaRemoteDatasource {
               nivelBateria: (map['battery'] ?? map['nivelBateria'] ?? map['nivel_bateria'] as num?)?.toInt() ?? 100,
               timestamp: map['timestamp'] != null
                   ? (DateTime.tryParse(map['timestamp'].toString()) ?? DateTime.now())
+                  : DateTime.now(),
+              sincronizado: true,
+            );
+          }).toList();
+        }
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  @override
+  Future<List<EventoIrrigacao>> buscarIrrigacoesRemotas() async {
+    try {
+      final response = await _client
+          .get(
+            _irrigacaoUri,
+            headers: {'Accept': 'application/json'},
+          )
+          .timeout(_timeout);
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        if (decoded is List) {
+          return decoded.map((item) {
+            final map = Map<String, dynamic>.from(item as Map);
+            final rawZone = map['zone']?.toString() ?? 'A';
+            final zone = rawZone.startsWith('Zona ') ? rawZone : 'Zona $rawZone';
+            return EventoIrrigacao(
+              id: map['message_id']?.toString() ?? map['id']?.toString() ?? 'IRR-${DateTime.now().millisecondsSinceEpoch}',
+              telemetriaId: null,
+              zona: zone,
+              valvulaAcionada: true,
+              volumeLitros: 150.0,
+              motivo: 'Umidade crítica (${map['moisture'] ?? 35}%) consolidada pelo Líder',
+              timestamp: map['activated_at'] != null
+                  ? (DateTime.tryParse(map['activated_at'].toString()) ?? DateTime.now())
                   : DateTime.now(),
               sincronizado: true,
             );

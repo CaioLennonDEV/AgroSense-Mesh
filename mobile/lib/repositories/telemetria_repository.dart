@@ -104,6 +104,12 @@ class TelemetriaRepository {
   // ==========================================================================
 
   Future<List<EventoIrrigacao>> listarIrrigacoes() async {
+    try {
+      final remotas = await _remoteDatasource.buscarIrrigacoesRemotas();
+      for (final r in remotas) {
+        await _localDatasource.salvarOuAtualizarIrrigacao(r);
+      }
+    } catch (_) {}
     return await _localDatasource.listarTodasIrrigacoes();
   }
 
@@ -141,19 +147,11 @@ class TelemetriaRepository {
     final irrigacoesPendentes = await _localDatasource.listarIrrigacoesPendentes();
 
     final totalPendentes = telemetriasPendentes.length + irrigacoesPendentes.length;
-    if (totalPendentes == 0) {
-      return const SyncResult(
-        totalPendentes: 0,
-        sincronizadosComSucesso: 0,
-        falhas: 0,
-        mensagem: 'Todos os dados de telemetria já estão sincronizados.',
-      );
-    }
 
     int sucessoCount = 0;
     int falhasCount = 0;
 
-    // Sincroniza Telemetrias
+    // Sincroniza Telemetrias locais
     for (final t in telemetriasPendentes) {
       try {
         final sucesso = await _remoteDatasource.enviarTelemetria(t);
@@ -168,7 +166,7 @@ class TelemetriaRepository {
       }
     }
 
-    // Sincroniza Irrigações
+    // Sincroniza Irrigações locais
     for (final i in irrigacoesPendentes) {
       try {
         final sucesso = await _remoteDatasource.enviarEventoIrrigacao(i);
@@ -183,21 +181,34 @@ class TelemetriaRepository {
       }
     }
 
-    // Baixa leituras sincronizadas de outros nós/dispositivos do cluster
+    // Baixa leituras e irrigações sincronizadas da nuvem (PostgreSQL)
+    int sincronizadosNuvem = 0;
     try {
       final remotas = await _remoteDatasource.buscarTelemetriasRemotas();
       for (final r in remotas) {
         await _localDatasource.salvarOuAtualizarTelemetria(r);
+        sincronizadosNuvem++;
+      }
+      final irrRemotas = await _remoteDatasource.buscarIrrigacoesRemotas();
+      for (final irr in irrRemotas) {
+        await _localDatasource.salvarOuAtualizarIrrigacao(irr);
       }
     } catch (_) {}
+
+    String mensagem;
+    if (totalPendentes == 0) {
+      mensagem = 'Dados sincronizados com o PostgreSQL central ($sincronizadosNuvem registros).';
+    } else if (falhasCount == 0) {
+      mensagem = '$sucessoCount registro(s) sincronizado(s) com sucesso!';
+    } else {
+      mensagem = 'Sincronizados: $sucessoCount | Falhas de rede: $falhasCount';
+    }
 
     return SyncResult(
       totalPendentes: totalPendentes,
       sincronizadosComSucesso: sucessoCount,
       falhas: falhasCount,
-      mensagem: falhasCount == 0
-          ? '$sucessoCount registro(s) sincronizado(s) com sucesso!'
-          : 'Sincronizados: $sucessoCount | Falhas de rede: $falhasCount',
+      mensagem: mensagem,
     );
   }
 }
