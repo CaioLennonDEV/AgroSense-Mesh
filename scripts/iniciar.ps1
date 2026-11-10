@@ -1,4 +1,4 @@
-﻿# AgroSense Mesh - Script de Inicialização Completa
+# AgroSense Mesh - Script de Inicialização Completa
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 Write-Host "======================================================================" -ForegroundColor Cyan
@@ -94,3 +94,4 @@ if ($resposta -match '^[Ss]') {
     if ($urlMobile) { Start-Process $urlMobile }
     if ($urlDash)   { Start-Process $urlDash }
 }
+

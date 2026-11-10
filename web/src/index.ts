@@ -1,32 +1,32 @@
 import Fastify from 'fastify';
-import fastifyStatic  from '@fastify/static';
-import fastifyWs      from '@fastify/websocket';
-import path           from 'path';
-import { Pool }       from 'pg';
-import WebSocket      from 'ws';
+import fastifyStatic from '@fastify/static';
+import fastifyWs from '@fastify/websocket';
+import path from 'path';
+import { Pool } from 'pg';
+import WebSocket from 'ws';
 
-const PORT  = Number(process.env.WEB_PORT ?? 3000);
-const app   = Fastify({ logger: false });
+const PORT = Number(process.env.WEB_PORT ?? 3000);
+const app = Fastify({ logger: false });
 
 // ─── Banco de dados (somente leitura – aponta para a réplica PostgreSQL) ──────
 const pool = new Pool({
-  host:     process.env.DB_HOST     ?? 'postgres-replica',
-  port:     Number(process.env.DB_PORT ?? 5432),
-  database: process.env.DB_NAME     ?? 'agrosense',
-  user:     process.env.DB_USER     ?? 'agro',
+  host: process.env.DB_HOST ?? 'postgres-replica',
+  port: Number(process.env.DB_PORT ?? 5432),
+  database: process.env.DB_NAME ?? 'agrosense',
+  user: process.env.DB_USER ?? 'agro',
   password: process.env.DB_PASSWORD ?? 'agro123',
 });
 
 // ─── Estado em memória ────────────────────────────────────────────────────────
 interface WorkerStatus {
-  node_id:    string;
-  status:     string;
-  lamport:    number;
+  node_id: string;
+  status: string;
+  lamport: number;
   updated_at: number;
 }
 
 const workerStatuses = new Map<string, WorkerStatus>();
-const wsClients      = new Set<WebSocket>();
+const wsClients = new Set<WebSocket>();
 
 // ─── Broadcast para todos os clientes WS conectados ──────────────────────────
 function broadcast(event: string, data: unknown): void {
@@ -61,7 +61,7 @@ async function pollIrrigationLogs(): Promise<void> {
 async function bootstrap(): Promise<void> {
   // ── Plugins Fastify ─────────────────────────────────────────────────────────
   await app.register(fastifyStatic, {
-    root:   path.join(__dirname, '../src/public'),
+    root: path.join(__dirname, '../src/public'),
     prefix: '/',
   });
 
@@ -77,8 +77,8 @@ async function bootstrap(): Promise<void> {
     // Envia estado inicial dos workers
     ws.send(JSON.stringify({
       event: 'worker-status',
-      data:  Array.from(workerStatuses.values()),
-      ts:    Date.now(),
+      data: Array.from(workerStatuses.values()),
+      ts: Date.now(),
     }));
 
     ws.on('close', () => {

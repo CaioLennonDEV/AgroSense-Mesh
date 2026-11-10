@@ -1,4 +1,4 @@
-﻿# AgroSense Mesh - Script de Parada Completa
+# AgroSense Mesh - Script de Parada Completa
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 Write-Host "======================================================================" -ForegroundColor Cyan
@@ -18,3 +18,4 @@ Write-Host "[OK] Todos os serviços e túneis foram pausados com sucesso!" -Fore
 Write-Host "     Nenhum recurso de CPU ou memória RAM está sendo consumido." -ForegroundColor White
 Write-Host "======================================================================" -ForegroundColor Green
 Write-Host ""
+
