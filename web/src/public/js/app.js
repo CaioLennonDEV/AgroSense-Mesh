@@ -4,7 +4,8 @@
  */
 
 // ─── Conexão WebSocket ───────────────────────────────────────────────────────
-const WS_URL    = `ws://${location.host}/ws`;
+const wsProto   = location.protocol === 'https:' ? 'wss:' : 'ws:';
+const WS_URL    = `${wsProto}//${location.host}/ws`;
 const dot       = document.getElementById('ws-dot');
 const wsLabel   = document.getElementById('ws-label');
 const lamportEl = document.getElementById('lamport-terminal');
