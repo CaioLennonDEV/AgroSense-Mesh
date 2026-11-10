@@ -89,6 +89,16 @@ async function bootstrap(): Promise<void> {
     ws.on('error', (err: Error) => console.error('[Web] WS erro:', err.message));
   });
 
+  // ── CORS Headers para permitir requisições do App Mobile ───────────────────
+  app.addHook('onRequest', async (req, reply) => {
+    reply.header('Access-Control-Allow-Origin', '*');
+    reply.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    reply.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+    if (req.method === 'OPTIONS') {
+      return reply.status(204).send();
+    }
+  });
+
   // ── REST API ─────────────────────────────────────────────────────────────────
 
   /** Endpoint REST para o aplicativo móvel Flutter enviar telemetria */
@@ -96,6 +106,28 @@ async function bootstrap(): Promise<void> {
     const body = req.body as any;
     console.log(`[Web] Telemetria recebida do App Mobile Flutter: sensor=${body?.sensor_id ?? body?.sensorId} zona=${body?.zona}`);
     return reply.status(201).send({ status: 'ok', message: 'Telemetria recebida e processada com sucesso', data: body });
+  });
+
+  /** Endpoint REST para listar telemetrias recentes */
+  app.get('/api/telemetry', async (_req, reply) => {
+    try {
+      const result = await pool.query(
+        `SELECT id, sensor_id, zone, moisture, temperature, battery, lamport_time, created_at
+           FROM telemetry_log
+          ORDER BY lamport_time DESC
+          LIMIT 20`
+      );
+      return reply.send(result.rows);
+    } catch {
+      return reply.send([]);
+    }
+  });
+
+  /** Endpoint REST para o aplicativo móvel Flutter enviar eventos de irrigação */
+  app.post('/api/irrigation-logs', async (req, reply) => {
+    const body = req.body as any;
+    console.log(`[Web] Evento de irrigação recebido do App Mobile Flutter: zona=${body?.zona}`);
+    return reply.status(201).send({ status: 'ok', message: 'Evento de irrigação sincronizado com sucesso', data: body });
   });
 
   /** Atualiza status de um worker (chamado pelos próprios workers via HTTP) */

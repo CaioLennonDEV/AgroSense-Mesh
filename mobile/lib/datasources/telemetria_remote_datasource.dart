@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/evento_irrigacao.dart';
 import '../models/registro_telemetria.dart';
@@ -29,9 +30,24 @@ class TelemetriaRemoteDatasourceImpl implements TelemetriaRemoteDatasource {
     Uri? irrigacaoUri,
     Duration timeout = const Duration(seconds: 5),
   })  : _client = client ?? http.Client(),
-        _telemetriaUri = telemetriaUri ?? Uri.parse('http://localhost:3000/api/telemetry'),
-        _irrigacaoUri = irrigacaoUri ?? Uri.parse('http://localhost:3000/api/irrigation-logs'),
+        _telemetriaUri = telemetriaUri ?? _obterDefaultTelemetriaUri(),
+        _irrigacaoUri = irrigacaoUri ?? _obterDefaultIrrigacaoUri(),
         _timeout = timeout;
+
+  static Uri _obterDefaultTelemetriaUri() {
+    if (kIsWeb) {
+      // No browser (Flutter Web), utiliza a origem atual (funciona no localhost e via túnel HTTPS)
+      return Uri.base.resolve('/api/telemetry');
+    }
+    return Uri.parse('http://localhost:3000/api/telemetry');
+  }
+
+  static Uri _obterDefaultIrrigacaoUri() {
+    if (kIsWeb) {
+      return Uri.base.resolve('/api/irrigation-logs');
+    }
+    return Uri.parse('http://localhost:3000/api/irrigation-logs');
+  }
 
   @override
   Future<bool> enviarTelemetria(RegistroTelemetria telemetria) async {

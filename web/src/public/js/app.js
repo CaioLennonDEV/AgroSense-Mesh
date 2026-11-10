@@ -4,10 +4,10 @@
  */
 
 // ─── Conexão WebSocket ───────────────────────────────────────────────────────
-const wsProto   = location.protocol === 'https:' ? 'wss:' : 'ws:';
-const WS_URL    = `${wsProto}//${location.host}/ws`;
-const dot       = document.getElementById('ws-dot');
-const wsLabel   = document.getElementById('ws-label');
+const wsProto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+const WS_URL = `${wsProto}//${location.host}/ws`;
+const dot = document.getElementById('ws-dot');
+const wsLabel = document.getElementById('ws-label');
 const lamportEl = document.getElementById('lamport-terminal');
 
 let ws = null;
@@ -59,10 +59,10 @@ function handleMessage(msg) {
 function updateWorkerCards(workers) {
   // Reseta todos os cards primeiro
   for (let i = 1; i <= 3; i++) {
-    const card   = document.getElementById(`worker-card-${i}`);
-    const badge  = document.getElementById(`badge-${i}`);
-    const crown  = document.getElementById(`crown-${i}`);
-    if (card)  { card.className = 'worker-card'; }
+    const card = document.getElementById(`worker-card-${i}`);
+    const badge = document.getElementById(`badge-${i}`);
+    const crown = document.getElementById(`crown-${i}`);
+    if (card) { card.className = 'worker-card'; }
     if (badge) { badge.className = 'status-badge'; badge.textContent = 'OFFLINE'; }
     if (crown) { crown.style.display = 'none'; }
   }
@@ -70,14 +70,14 @@ function updateWorkerCards(workers) {
   if (!Array.isArray(workers)) return;
 
   workers.forEach(w => {
-    const id     = w.node_id ? w.node_id.replace(/\D/g, '') : null;
+    const id = w.node_id ? w.node_id.replace(/\D/g, '') : null;
     if (!id) return;
 
-    const card      = document.getElementById(`worker-card-${id}`);
-    const badge     = document.getElementById(`badge-${id}`);
-    const crown     = document.getElementById(`crown-${id}`);
+    const card = document.getElementById(`worker-card-${id}`);
+    const badge = document.getElementById(`badge-${id}`);
+    const crown = document.getElementById(`crown-${id}`);
     const statusTxt = document.getElementById(`status-text-${id}`);
-    const lamport   = document.getElementById(`lamport-${id}`);
+    const lamport = document.getElementById(`lamport-${id}`);
 
     if (!card) return;
 
@@ -88,8 +88,8 @@ function updateWorkerCards(workers) {
     badge.textContent = status;
 
     if (statusTxt) statusTxt.textContent = status;
-    if (lamport)   lamport.textContent   = w.lamport ?? '—';
-    if (crown)     crown.style.display   = status === 'LEADER' ? 'inline' : 'none';
+    if (lamport) lamport.textContent = w.lamport ?? '—';
+    if (crown) crown.style.display = status === 'LEADER' ? 'inline' : 'none';
 
     // Adiciona evento de Lamport no terminal
     addLamportEntry(
@@ -102,7 +102,7 @@ function updateWorkerCards(workers) {
 
 // ─── Terminal de Logs de Lamport ─────────────────────────────────────────────
 function addLamportEntry(source, event, value) {
-  const now  = new Date().toLocaleTimeString('pt-BR', { hour12: false });
+  const now = new Date().toLocaleTimeString('pt-BR', { hour12: false });
   const entry = document.createElement('div');
   entry.className = 'log-entry';
   entry.innerHTML =
@@ -133,10 +133,10 @@ function renderIrrigationTable(logs) {
   }
 
   const rows = logs.map(row => {
-    const moisture    = parseFloat(row.moisture ?? 0).toFixed(1);
-    const temp        = parseFloat(row.temperature ?? 0).toFixed(1);
+    const moisture = parseFloat(row.moisture ?? 0).toFixed(1);
+    const temp = parseFloat(row.temperature ?? 0).toFixed(1);
     const moistureClass = parseFloat(moisture) < 40 ? 'moisture-low' : 'moisture-ok';
-    const ts          = row.activated_at
+    const ts = row.activated_at
       ? new Date(row.activated_at).toLocaleString('pt-BR')
       : '—';
 
@@ -182,7 +182,7 @@ function renderIrrigationTable(logs) {
 // ─── Polling de logs de irrigação via REST (fallback se WS não enviar) ───────
 async function pollIrrigation() {
   try {
-    const res  = await fetch('/api/irrigation-logs');
+    const res = await fetch('/api/irrigation-logs');
     if (!res.ok) return;
     const data = await res.json();
     renderIrrigationTable(data);

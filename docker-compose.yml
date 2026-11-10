@@ -247,6 +247,7 @@ services:
     build:
       context: ./mobile
       dockerfile: Dockerfile
+    image: mobile-agrosense-mobile-web:latest
     container_name: agrosense-mobile
     ports:
       - "8080:8080"
