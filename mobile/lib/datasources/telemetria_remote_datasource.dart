@@ -97,16 +97,18 @@ class TelemetriaRemoteDatasourceImpl implements TelemetriaRemoteDatasource {
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         if (decoded is List) {
-          return decoded.take(5).map((item) {
+          return decoded.map((item) {
             final map = Map<String, dynamic>.from(item as Map);
             return RegistroTelemetria(
-              id: 'REMOTO-${map['id'] ?? '0'}',
-              sensorId: 'SENSOR-CLOUD',
-              zona: 'Zona A',
-              umidadeSolo: 45.0,
-              temperatura: 27.0,
-              nivelBateria: 90,
-              timestamp: DateTime.now(),
+              id: map['id']?.toString() ?? 'REMOTO-${DateTime.now().millisecondsSinceEpoch}',
+              sensorId: map['sensor_id']?.toString() ?? map['sensorId']?.toString() ?? 'sensor-A-01',
+              zona: map['zone']?.toString() ?? map['zona']?.toString() ?? 'Zona A',
+              umidadeSolo: (map['moisture'] ?? map['umidadeSolo'] ?? map['umidade_solo'] as num?)?.toDouble() ?? 50.0,
+              temperatura: (map['temperature'] ?? map['temperatura'] as num?)?.toDouble() ?? 25.0,
+              nivelBateria: (map['battery'] ?? map['nivelBateria'] ?? map['nivel_bateria'] as num?)?.toInt() ?? 100,
+              timestamp: map['timestamp'] != null
+                  ? (DateTime.tryParse(map['timestamp'].toString()) ?? DateTime.now())
+                  : DateTime.now(),
               sincronizado: true,
             );
           }).toList();

@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/evento_irrigacao.dart';
 import '../models/registro_telemetria.dart';
@@ -28,17 +30,63 @@ abstract class TelemetriaLocalDatasource {
 class TelemetriaLocalDatasourceImpl implements TelemetriaLocalDatasource {
   final DatabaseHelper _dbHelper;
 
-  // Fallback em memória para Flutter Web
+  // Armazenamento em memória sincronizado com SharedPreferences para Flutter Web
   static final Map<String, RegistroTelemetria> _webTelemetrias = {};
   static final Map<String, EventoIrrigacao> _webIrrigacoes = {};
   static bool _webInicializado = false;
+
+  static const _kStorageTelemetrias = 'agrosense_telemetrias_cache_v3';
+  static const _kStorageIrrigacoes = 'agrosense_irrigacoes_cache_v3';
 
   TelemetriaLocalDatasourceImpl({DatabaseHelper? dbHelper})
       : _dbHelper = dbHelper ?? DatabaseHelper() {
     if (kIsWeb && !_webInicializado) {
       _popularWebMock();
+      _carregarWebStorage();
       _webInicializado = true;
     }
+  }
+
+  static Future<void> _salvarWebStorage() async {
+    if (!kIsWeb) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final listTel = _webTelemetrias.values.map((t) => t.toMap()).toList();
+      await prefs.setString(_kStorageTelemetrias, jsonEncode(listTel));
+
+      final listIrr = _webIrrigacoes.values.map((i) => i.toMap()).toList();
+      await prefs.setString(_kStorageIrrigacoes, jsonEncode(listIrr));
+    } catch (_) {}
+  }
+
+  static Future<void> _carregarWebStorage() async {
+    if (!kIsWeb) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final strTel = prefs.getString(_kStorageTelemetrias);
+      if (strTel != null && strTel.isNotEmpty) {
+        final decoded = jsonDecode(strTel);
+        if (decoded is List && decoded.isNotEmpty) {
+          _webTelemetrias.clear();
+          for (final item in decoded) {
+            final t = RegistroTelemetria.fromMap(Map<String, dynamic>.from(item as Map));
+            _webTelemetrias[t.id] = t;
+          }
+        }
+      }
+
+      final strIrr = prefs.getString(_kStorageIrrigacoes);
+      if (strIrr != null && strIrr.isNotEmpty) {
+        final decoded = jsonDecode(strIrr);
+        if (decoded is List && decoded.isNotEmpty) {
+          _webIrrigacoes.clear();
+          for (final item in decoded) {
+            final i = EventoIrrigacao.fromMap(Map<String, dynamic>.from(item as Map));
+            _webIrrigacoes[i.id] = i;
+          }
+        }
+      }
+    } catch (_) {}
   }
 
   void _popularWebMock() {
@@ -129,6 +177,7 @@ class TelemetriaLocalDatasourceImpl implements TelemetriaLocalDatasource {
   Future<void> salvarOuAtualizarTelemetria(RegistroTelemetria telemetria) async {
     if (kIsWeb) {
       _webTelemetrias[telemetria.id] = telemetria;
+      _salvarWebStorage();
       return;
     }
     final db = await _db;
@@ -189,6 +238,7 @@ class TelemetriaLocalDatasourceImpl implements TelemetriaLocalDatasource {
   Future<void> removerTelemetriaPorId(String id) async {
     if (kIsWeb) {
       _webTelemetrias.remove(id);
+      _salvarWebStorage();
       return;
     }
     final db = await _db;
@@ -203,6 +253,7 @@ class TelemetriaLocalDatasourceImpl implements TelemetriaLocalDatasource {
   Future<void> salvarOuAtualizarIrrigacao(EventoIrrigacao evento) async {
     if (kIsWeb) {
       _webIrrigacoes[evento.id] = evento;
+      _salvarWebStorage();
       return;
     }
     final db = await _db;
@@ -247,6 +298,7 @@ class TelemetriaLocalDatasourceImpl implements TelemetriaLocalDatasource {
   Future<void> removerIrrigacaoPorId(String id) async {
     if (kIsWeb) {
       _webIrrigacoes.remove(id);
+      _salvarWebStorage();
       return;
     }
     final db = await _db;

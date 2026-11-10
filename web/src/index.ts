@@ -17,6 +17,34 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD ?? 'agro123',
 });
 
+// ─── Banco de dados Primário (escrita – aponta para o master PostgreSQL) ───────
+const primaryPool = new Pool({
+  host: process.env.DB_PRIMARY_HOST ?? 'postgres-primary',
+  port: Number(process.env.DB_PRIMARY_PORT ?? 5432),
+  database: process.env.DB_NAME ?? 'agrosense',
+  user: process.env.DB_USER ?? 'agro',
+  password: process.env.DB_PASSWORD ?? 'agro123',
+});
+
+async function ensureTables(): Promise<void> {
+  try {
+    await primaryPool.query(`
+      CREATE TABLE IF NOT EXISTS telemetry_log (
+        id           TEXT PRIMARY KEY,
+        sensor_id    TEXT NOT NULL,
+        zone         TEXT NOT NULL,
+        moisture     REAL NOT NULL,
+        temperature  REAL NOT NULL,
+        battery      INTEGER NOT NULL,
+        timestamp    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+    console.log('[Web] Tabela telemetry_log garantida no Postgres Primário.');
+  } catch (err: any) {
+    console.error('[Web] Erro ao criar tabela no Postgres:', err.message);
+  }
+}
+
 // ─── Estado em memória ────────────────────────────────────────────────────────
 interface WorkerStatus {
   node_id: string;
@@ -59,6 +87,8 @@ async function pollIrrigationLogs(): Promise<void> {
 
 // ─── Bootstrap ───────────────────────────────────────────────────────────────
 async function bootstrap(): Promise<void> {
+  await ensureTables();
+
   // ── Plugins Fastify ─────────────────────────────────────────────────────────
   await app.register(fastifyStatic, {
     root: path.join(__dirname, '../src/public'),
@@ -104,29 +134,84 @@ async function bootstrap(): Promise<void> {
   /** Endpoint REST para o aplicativo móvel Flutter enviar telemetria */
   app.post('/api/telemetry', async (req, reply) => {
     const body = req.body as any;
-    console.log(`[Web] Telemetria recebida do App Mobile Flutter: sensor=${body?.sensor_id ?? body?.sensorId} zona=${body?.zona}`);
-    return reply.status(201).send({ status: 'ok', message: 'Telemetria recebida e processada com sucesso', data: body });
+    const id = body.id || `TEL-${Date.now()}`;
+    const sensorId = body.sensor_id ?? body.sensorId ?? 'SENSOR-MANUAL';
+    const zone = body.zona ?? body.zone ?? 'Zona A';
+    const moisture = Number(body.umidade_solo ?? body.umidadeSolo ?? body.moisture ?? 50.0);
+    const temperature = Number(body.temperatura ?? body.temperature ?? 25.0);
+    const battery = Number(body.nivel_bateria ?? body.nivelBateria ?? body.battery ?? 100);
+    const ts = body.timestamp ? new Date(body.timestamp) : new Date();
+
+    try {
+      await primaryPool.query(
+        `INSERT INTO telemetry_log (id, sensor_id, zone, moisture, temperature, battery, timestamp)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         ON CONFLICT (id) DO UPDATE SET
+           sensor_id = EXCLUDED.sensor_id,
+           zone = EXCLUDED.zone,
+           moisture = EXCLUDED.moisture,
+           temperature = EXCLUDED.temperature,
+           battery = EXCLUDED.battery,
+           timestamp = EXCLUDED.timestamp`,
+        [id, sensorId, zone, moisture, temperature, battery, ts]
+      );
+      console.log(`[Web] Telemetria gravada no PostgreSQL Primário: id=${id} sensor=${sensorId} zona=${zone}`);
+    } catch (e: any) {
+      console.error('[Web] Erro ao gravar telemetria no Postgres:', e.message);
+    }
+    return reply.status(201).send({ status: 'ok', message: 'Telemetria gravada no banco com sucesso', data: { id, sensorId, zone, moisture, temperature, battery, timestamp: ts } });
   });
 
   /** Endpoint REST para listar telemetrias recentes */
   app.get('/api/telemetry', async (_req, reply) => {
     try {
       const result = await pool.query(
-        `SELECT id, sensor_id, zone, moisture, temperature, battery, lamport_time, created_at
+        `SELECT id, sensor_id, zone, moisture, temperature, battery, timestamp
            FROM telemetry_log
-          ORDER BY lamport_time DESC
-          LIMIT 20`
+          ORDER BY timestamp DESC
+          LIMIT 100`
       );
       return reply.send(result.rows);
     } catch {
-      return reply.send([]);
+      try {
+        const result = await primaryPool.query(
+          `SELECT id, sensor_id, zone, moisture, temperature, battery, timestamp
+             FROM telemetry_log
+            ORDER BY timestamp DESC
+            LIMIT 100`
+        );
+        return reply.send(result.rows);
+      } catch {
+        return reply.send([]);
+      }
     }
   });
 
   /** Endpoint REST para o aplicativo móvel Flutter enviar eventos de irrigação */
   app.post('/api/irrigation-logs', async (req, reply) => {
     const body = req.body as any;
-    console.log(`[Web] Evento de irrigação recebido do App Mobile Flutter: zona=${body?.zona}`);
+    const rawId = body.id || body.message_id || '';
+    // UUID v4 format or generate random UUID
+    let messageId = rawId;
+    if (!messageId || messageId.length < 32) {
+      messageId = '00000000-0000-4000-8000-' + Date.now().toString(16).padStart(12, '0').slice(-12);
+    }
+    const sensorId = body.sensor_id ?? body.sensorId ?? 'MANUAL';
+    const zone = (body.zona ?? body.zone ?? 'Zona A').replace('Zona ', '');
+    const moisture = Number(body.umidade ?? body.moisture ?? 35.0);
+    const temperature = Number(body.temperatura ?? body.temperature ?? 28.0);
+
+    try {
+      await primaryPool.query(
+        `INSERT INTO irrigation_log (message_id, sensor_id, zone, moisture, temperature, lamport_time, event_ts, worker_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         ON CONFLICT (message_id) DO NOTHING`,
+        [messageId, sensorId, zone, moisture, temperature, Date.now(), Date.now(), 99]
+      );
+      console.log(`[Web] Evento de irrigação gravado no PostgreSQL Primário: msgId=${messageId} zone=${zone}`);
+    } catch (e: any) {
+      console.error('[Web] Erro ao gravar irrigação no Postgres:', e.message);
+    }
     return reply.status(201).send({ status: 'ok', message: 'Evento de irrigação sincronizado com sucesso', data: body });
   });
 

@@ -42,6 +42,12 @@ class TelemetriaRepository {
   // ==========================================================================
 
   Future<List<RegistroTelemetria>> listarTelemetrias() async {
+    try {
+      final remotas = await _remoteDatasource.buscarTelemetriasRemotas();
+      for (final r in remotas) {
+        await _localDatasource.salvarOuAtualizarTelemetria(r);
+      }
+    } catch (_) {}
     return await _localDatasource.listarTodasTelemetrias();
   }
 
@@ -176,6 +182,14 @@ class TelemetriaRepository {
         falhasCount++;
       }
     }
+
+    // Baixa leituras sincronizadas de outros nós/dispositivos do cluster
+    try {
+      final remotas = await _remoteDatasource.buscarTelemetriasRemotas();
+      for (final r in remotas) {
+        await _localDatasource.salvarOuAtualizarTelemetria(r);
+      }
+    } catch (_) {}
 
     return SyncResult(
       totalPendentes: totalPendentes,
